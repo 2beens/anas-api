@@ -57,6 +57,10 @@ func (s *Server) routerSetup() *mux.Router {
 		rw.Write([]byte("I'm OK"))
 	})
 
+	r.HandleFunc("/ping", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Write([]byte("pong"))
+	})
+
 	r.Use(middleware.PanicRecovery())
 	r.Use(middleware.LogRequest())
 	r.Use(middleware.Cors())
