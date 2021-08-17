@@ -21,3 +21,10 @@ time="2021-08-17T18:41:55+02:00" level=fatal msg="http: Server closed"
 [36mINFO[0m[0000]  > server listening on: [localhost:9000]     
 [37mTRAC[0m[0017]  ====> request [GET] path: [/] [UA: curl/7.68.0] 
 [37mTRAC[0m[0019]  ====> request [GET] path: [/] [UA: curl/7.68.0] 
+[37mDEBU[0m[0000] using port: 9000                             
+[37mDEBU[0m[0000] using server logs path: [./service.log]      
+[36mINFO[0m[0000]  > server listening on: [localhost:9000]     
+[37mTRAC[0m[0005]  ====> request [GET] path: [/] [UA: curl/7.64.1] 
+[33mWARN[0m[0008] signal [interrupt] received ...              
+[37mDEBU[0m[0008] graceful shutdown initiated ...              
+[31mFATA[0m[0008] http: Server closed                          
