@@ -11,7 +11,7 @@ import (
 func main() {
 	fmt.Println("starting ...")
 
-	port := 9000
+	port := 10222
 	logsPath := "./service.log"
 
 	logging.Setup(logsPath, true, "")
