@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/2beens/anas-api/internal/middleware"
+	"github.com/2beens/anas-api/internal/recommendations"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -60,6 +61,10 @@ func (s *Server) routerSetup() *mux.Router {
 	r.HandleFunc("/ping", func(rw http.ResponseWriter, r *http.Request) {
 		rw.Write([]byte("pong"))
 	})
+
+	recommendationsRouter := r.PathPrefix("/recommendations").Subrouter()
+	recommendationsApi := recommendations.NewInMemApi()
+	SetupRecommendationsHandler(recommendationsRouter, recommendationsApi)
 
 	r.Use(middleware.PanicRecovery())
 	r.Use(middleware.LogRequest())
