@@ -1,12 +1,16 @@
 package internal
 
 import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 
-	"fmt"
-
-	"encoding/json"
+	"path/filepath"
+	"strings"
 
 	"github.com/2beens/anas-api/internal/therapy"
 	"github.com/gorilla/mux"
@@ -52,5 +56,52 @@ func (h *TherapyHandler) handleGetTherapy(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	log.Printf("returning therapy day %d for for user %d", dayIndex, userId)
+
 	WriteResponseBytes(w, "application/json", dayJson)
+}
+
+func (h *TherapyHandler) handleGetTherapyAudio(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userIdStr := vars["userId"]
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		http.Error(w, "invalid user id", http.StatusBadRequest)
+		return
+	}
+
+	dayIndexStr := vars["dayIndex"]
+	dayIndex, err := strconv.Atoi(dayIndexStr)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("invalid day index: %d", dayIndexStr), http.StatusBadRequest)
+		return
+	}
+
+	day, err := h.api.GetDay(userId, dayIndex)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	f, err := os.Open(day.AudioFilePath)
+	if err != nil {
+		log.Errorf("get therapy audio [%s]: %s", day.AudioFilePath, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	pathParts := strings.Split(day.AudioFilePath, string(filepath.Separator))
+	fileName := pathParts[len(pathParts)-1]
+
+	w.Header().Set("Content-Type", "audio/mpeg")
+	//w.Header().Set("Content-Length", "TODO")
+	// to encourage the browser to download the mp3 rather then streaming
+	w.Header().Set("Content-Disposition", fmt.Sprintf("filename=%s", fileName))
+
+	_, err = io.Copy(w, bufio.NewReader(f))
+	if err != nil {
+		log.Errorf("get therapy audio, copy [%s]: %s", day.AudioFilePath, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

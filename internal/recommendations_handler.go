@@ -29,6 +29,7 @@ func (h *RecommendationsHandler) handleRecommendationsToday(w http.ResponseWrite
 	userIdStr := vars["userId"]
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
+		log.Errorf("handle recommendations today: %s", err)
 		http.Error(w, "invalid user id", http.StatusBadRequest)
 		return
 	}
@@ -52,6 +53,8 @@ func (h *RecommendationsHandler) handleRecommendationsToday(w http.ResponseWrite
 		http.Error(w, "marshal recommendations error", http.StatusInternalServerError)
 		return
 	}
+
+	log.Printf("returning recommendations for today for user %d", userId)
 
 	WriteResponseBytes(w, "application/json", recsJson)
 }

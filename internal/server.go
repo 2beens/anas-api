@@ -71,6 +71,7 @@ func (s *Server) routerSetup() *mux.Router {
 
 	r.HandleFunc("/recommendations/{userId}/today", recHandler.handleRecommendationsToday).Methods("GET")
 	r.HandleFunc("/therapy/{userId}/{dayIndex}", therapyHandler.handleGetTherapy).Methods("GET")
+	r.HandleFunc("/therapy/{userId}/{dayIndex}/audio", therapyHandler.handleGetTherapyAudio).Methods("GET")
 
 	r.Use(middleware.PanicRecovery())
 	r.Use(middleware.LogRequest())
