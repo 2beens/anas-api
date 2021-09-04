@@ -2,14 +2,14 @@ package internal
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"strconv"
-
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/2beens/anas-api/internal/therapy"
@@ -93,12 +93,21 @@ func (h *TherapyHandler) handleGetTherapyAudio(w http.ResponseWriter, r *http.Re
 	pathParts := strings.Split(day.AudioFilePath, string(filepath.Separator))
 	fileName := pathParts[len(pathParts)-1]
 
+	reader := bufio.NewReader(f)
+	buf := new(bytes.Buffer)
+	bytesRead, err := buf.ReadFrom(reader)
+	if err != nil {
+		log.Errorf("get therapy audio [%s]: %s", day.AudioFilePath, err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "audio/mpeg")
-	//w.Header().Set("Content-Length", "TODO")
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", bytesRead))
 	// to encourage the browser to download the mp3 rather then streaming
 	w.Header().Set("Content-Disposition", fmt.Sprintf("filename=%s", fileName))
 
-	_, err = io.Copy(w, bufio.NewReader(f))
+	_, err = io.Copy(w, buf)
 	if err != nil {
 		log.Errorf("get therapy audio, copy [%s]: %s", day.AudioFilePath, err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
