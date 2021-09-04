@@ -16,15 +16,12 @@ type RecommendationsHandler struct {
 	api recommendations.Api
 }
 
-func SetupRecommendationsHandler(
-	router *mux.Router,
+func NewRecommendationsHandler(
 	api recommendations.Api,
-) {
-	h := &RecommendationsHandler{
+) *RecommendationsHandler {
+	return &RecommendationsHandler{
 		api: api,
 	}
-
-	router.HandleFunc("/{userId}/today", h.handleRecommendationsToday).Methods("GET")
 }
 
 func (h *RecommendationsHandler) handleRecommendationsToday(w http.ResponseWriter, r *http.Request) {

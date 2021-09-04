@@ -11,6 +11,7 @@ import (
 
 	"github.com/2beens/anas-api/internal/middleware"
 	"github.com/2beens/anas-api/internal/recommendations"
+	"github.com/2beens/anas-api/internal/therapy"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -62,9 +63,14 @@ func (s *Server) routerSetup() *mux.Router {
 		rw.Write([]byte("pong"))
 	})
 
-	recommendationsRouter := r.PathPrefix("/recommendations").Subrouter()
 	recommendationsApi := recommendations.NewInMemApi()
-	SetupRecommendationsHandler(recommendationsRouter, recommendationsApi)
+	therapyApi := therapy.NewInMemApi()
+
+	recHandler := NewRecommendationsHandler(recommendationsApi)
+	therapyHandler := NewTherapyHandler(therapyApi)
+
+	r.HandleFunc("/recommendations/{userId}/today", recHandler.handleRecommendationsToday).Methods("GET")
+	r.HandleFunc("/therapy/{userId}/{dayIndex}", therapyHandler.handleGetTherapy).Methods("GET")
 
 	r.Use(middleware.PanicRecovery())
 	r.Use(middleware.LogRequest())
