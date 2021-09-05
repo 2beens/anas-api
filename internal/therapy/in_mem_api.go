@@ -2,7 +2,6 @@ package therapy
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/2beens/anas-api/internal/errors"
 )
@@ -18,12 +17,13 @@ func NewInMemApi() *InMemApi {
 
 	// hardcode therapy days for now
 	userId := 1
+	api.Therapies[userId] = map[int]*Day{}
+
 	for i := 1; i <= 8; i++ {
 		title := "In progress..."
 		if i == 1 {
 			title = "Be calm and relax"
 		}
-		api.Therapies[userId] = map[int]*Day{}
 		api.Therapies[userId][i] = &Day{
 			Index:         i,
 			Title:         title,
@@ -31,9 +31,6 @@ func NewInMemApi() *InMemApi {
 			AudioURL:      fmt.Sprintf("/therapy/%d/%d/audio", userId, i),
 		}
 	}
-
-	log.Println("therapy days added for user 1:")
-	log.Printf("%+v\n", api.Therapies[userId])
 
 	return api
 }
