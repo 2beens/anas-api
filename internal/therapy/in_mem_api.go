@@ -2,6 +2,7 @@ package therapy
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/2beens/anas-api/internal/errors"
 )
@@ -31,16 +32,19 @@ func NewInMemApi() *InMemApi {
 		}
 	}
 
+	log.Println("therapy days added for user 1:")
+	log.Printf("%+v\n", api.Therapies[userId])
+
 	return api
 }
 
-func (api *InMemApi) GetDay(userId int, id int) (*Day, error) {
+func (api *InMemApi) GetDay(userId int, index int) (*Day, error) {
 	days, ok := api.Therapies[userId]
 	if !ok {
 		return nil, errors.ErrNotFound
 	}
 
-	day, ok := days[id]
+	day, ok := days[index]
 	if !ok {
 		return nil, errors.ErrNotFound
 	}

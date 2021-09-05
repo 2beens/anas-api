@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -44,6 +45,11 @@ func (h *TherapyHandler) handleGetTherapy(w http.ResponseWriter, r *http.Request
 	}
 
 	day, err := h.api.GetDay(userId, dayIndex)
+	if errors.Is(err, mux.ErrNotFound) {
+		log.Printf("get therapy for user %d and day %d: not found", userId, dayIndex)
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
